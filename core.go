@@ -21,6 +21,9 @@ func New(name string, db *sqlx.DB) *Prototype {
 	}
 }
 
+//================================================================
+// Insert
+//================================================================
 func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, me model.EngineInterface) {
 	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
@@ -45,6 +48,29 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 	}
 }
 
+//================================================================
+// Read: List
+//================================================================
+type ReqList struct {
+	Query  string `form:"q" binding:"omitempty"`
+	Offset uint64 `form:"pos" binding:"omitempty,numeric,min=0"`
+	Length uint64 `form:"len" binding:"omitempty,numeric,min=1,max=400"`
+}
+
+func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest interface{}, searchCols []string) {
+	req := new(ReqList)
+	if err := c.ShouldBindWith(req, binding.Query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
+	} else if err := me.List(dest, req.Query, searchCols, model.NewPagination(req.Offset, req.Length)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
+	}
+}
+
+//================================================================
+// Update
+//================================================================
 func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.EngineInterface, id string) {
 	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
@@ -72,6 +98,9 @@ func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.E
 	}
 }
 
+//================================================================
+// Delete
+//================================================================
 func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, id string) {
 	if exists, err := me.Has(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
