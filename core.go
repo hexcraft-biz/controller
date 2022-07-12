@@ -49,8 +49,10 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 }
 
 //================================================================
-// Read: List
+// Read
 //================================================================
+
+// List
 type ReqList struct {
 	Query  string `form:"q" binding:"omitempty"`
 	Offset uint64 `form:"pos" binding:"omitempty,numeric,min=0"`
@@ -63,6 +65,17 @@ func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest in
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 	} else if err := me.List(dest, req.Query, searchCols, model.NewPagination(req.Offset, req.Length)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
+	}
+}
+
+// Get
+func (p Prototype) RestfulGet(c *gin.Context, hook func(interface{}, string) error, dest interface{}, key string) {
+	if err := hook(dest, key); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else if dest == nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
 	}
