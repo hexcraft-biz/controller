@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-sql-driver/mysql"
@@ -73,9 +74,12 @@ func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest in
 // Get
 func (p Prototype) RestfulGet(c *gin.Context, hook func(interface{}, string) error, dest interface{}, key string) {
 	if err := hook(dest, key); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-	} else if dest == nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+		switch err {
+		case sql.ErrNoRows:
+			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		}
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
 	}
