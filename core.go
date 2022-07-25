@@ -33,9 +33,9 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 		if _, err := me.Insert(req); err != nil {
 			if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 				switch mysqlErr.Number {
-				case 1062:
+				case model.MysqlErrCodeConflict:
 					c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
-				case 1452:
+				case model.MysqlErrCodeForeignKeyConstraintFails:
 					c.JSON(http.StatusUnprocessableEntity, gin.H{"message": http.StatusText(http.StatusUnprocessableEntity)})
 				default:
 					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -99,9 +99,9 @@ func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.E
 		} else if _, err := me.UpdateByID(id, req); err != nil {
 			if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 				switch mysqlErr.Number {
-				case 1062:
+				case model.MysqlErrCodeConflict:
 					c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
-				case 1452:
+				case model.MysqlErrCodeForeignKeyConstraintFails:
 					c.JSON(http.StatusUnprocessableEntity, gin.H{"message": http.StatusText(http.StatusUnprocessableEntity)})
 				default:
 					c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
