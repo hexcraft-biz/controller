@@ -44,7 +44,7 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			}
 		} else {
-			c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": req})
+			c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": req})
 		}
 	}
 }
