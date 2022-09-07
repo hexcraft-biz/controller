@@ -31,7 +31,7 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 	} else {
 		req.Init()
 		if _, err := me.Insert(req); err != nil {
-			mysqlErrResponse(c, err)
+			MysqlErrDefaultResponse(c, err)
 		} else {
 			c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": req})
 		}
@@ -86,7 +86,7 @@ func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.E
 		} else if !exists {
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 		} else if _, err := me.UpdateByID(id, req); err != nil {
-			mysqlErrResponse(c, err)
+			MysqlErrDefaultResponse(c, err)
 		} else {
 			c.JSON(http.StatusNoContent, nil)
 		}
@@ -102,13 +102,16 @@ func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, i
 	} else if !exists {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 	} else if _, err := me.DeleteByID(id); err != nil {
-		mysqlErrResponse(c, err)
+		MysqlErrDefaultResponse(c, err)
 	} else {
 		c.JSON(http.StatusNoContent, nil)
 	}
 }
 
-func mysqlErrResponse(c *gin.Context, err error) {
+//================================================================
+// MysqlErrDefaultResponse
+//================================================================
+func MysqlErrDefaultResponse(c *gin.Context, err error) {
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		switch mysqlErr.Number {
 		case model.MysqlErrCodeConflict:
