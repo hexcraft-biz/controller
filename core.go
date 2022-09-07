@@ -114,12 +114,12 @@ func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, i
 func MysqlErrDefaultResponse(c *gin.Context, err error) {
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		switch mysqlErr.Number {
-		case model.MysqlErrCodeConflict:
+		case model.MysqlErrCodeDuplicateEntry:
 			c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
 		case model.MysqlErrCodeForeignKeyConstraintFailsCreate:
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"message": http.StatusText(http.StatusUnprocessableEntity)})
+			c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
 		case model.MysqlErrCodeForeignKeyConstraintFailsDelete:
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"message": http.StatusText(http.StatusUnprocessableEntity)})
+			c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		}
