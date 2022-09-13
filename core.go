@@ -97,12 +97,10 @@ func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.E
 // Delete
 //================================================================
 func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, id string) {
-	if exists, err := me.Has(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-	} else if !exists {
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	} else if _, err := me.DeleteByID(id); err != nil {
+	if affectedRows, err := me.DeleteByID(id); err != nil {
 		MysqlErrDefaultResponse(c, err)
+	} else if affectedRows <= 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 	} else {
 		c.JSON(http.StatusNoContent, nil)
 	}
