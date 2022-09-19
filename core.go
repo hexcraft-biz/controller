@@ -109,7 +109,7 @@ func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, i
 //================================================================
 // MysqlErrDefaultResponse
 //================================================================
-func MysqlErrDefaultResponse(c *gin.Context, err error, hook func(*gin.Context, error)) {
+func MysqlErrDefaultResponse(c *gin.Context, err error, hook func(*gin.Context, uint16)) {
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		switch mysqlErr.Number {
 		case model.MysqlErrCodeDuplicateEntry:
@@ -122,7 +122,7 @@ func MysqlErrDefaultResponse(c *gin.Context, err error, hook func(*gin.Context, 
 			if hook == nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			} else {
-				hook(c, err)
+				hook(c, mysqlErr.Number)
 			}
 		}
 	} else {
