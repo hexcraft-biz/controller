@@ -31,7 +31,7 @@ func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, m
 	} else {
 		req.Init()
 		if _, err := me.Insert(req); err != nil {
-			MysqlErrDefaultResponse(c, err, MysqlErrIncorrectValueDefaultHook)
+			MysqlErrDefaultResponse(c, err, nil)
 		} else {
 			c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": req})
 		}
