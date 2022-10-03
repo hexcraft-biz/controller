@@ -30,16 +30,11 @@ type ReqUri struct {
 //================================================================
 // Insert
 //================================================================
-func (p Prototype) RestfulInsert(c *gin.Context, me model.EngineInterface, req model.PrototypeInterface) {
-	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
+func (p Prototype) RestfulInsert(c *gin.Context, me model.EngineInterface, req interface{}) {
+	if _, err := me.Insert(req); err != nil {
+		MysqlErrDefaultResponse(c, err, nil)
 	} else {
-		req.Init()
-		if _, err := me.Insert(req); err != nil {
-			MysqlErrDefaultResponse(c, err, nil)
-		} else {
-			c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": req})
-		}
+		c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": req})
 	}
 }
 
