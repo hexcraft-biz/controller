@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-sql-driver/mysql"
+	"github.com/hexcraft-biz/misc/xuuid"
 	"github.com/hexcraft-biz/model"
 	"github.com/jmoiron/sqlx"
 	"net/http"
@@ -20,6 +21,10 @@ func New(name string, db *sqlx.DB) *Prototype {
 		Name: name,
 		DB:   db,
 	}
+}
+
+type ReqUri struct {
+	ID xuuid.UUID `uri:"id" binding:"required"`
 }
 
 //================================================================

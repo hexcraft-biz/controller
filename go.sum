@@ -24,6 +24,8 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/hexcraft-biz/misc v0.1.11 h1:ixA49NA1jf5edEDOVyC5vWBU7bbYwRSZV3JbmzGxh3k=
+github.com/hexcraft-biz/misc v0.1.11/go.mod h1:ZpskgUC3pdFII0MF38oiz5i5EUU1m2tUlfPZekKb+mA=
 github.com/hexcraft-biz/model v0.0.8 h1:C7irUPI6YKjUb0aPjVmGj+VlE2paOw3Y3kVPEaVljOs=
 github.com/hexcraft-biz/model v0.0.8/go.mod h1:g49UsPp/tZ8qPlEr8qe9Qab0MxWmGzax3KJf2coB3P4=
 github.com/hexcraft-biz/model v0.0.10 h1:XE1/1YdAl+S02mW01pywtahqMkK38U6RUaPUhOoRk6U=
