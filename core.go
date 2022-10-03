@@ -24,7 +24,7 @@ func New(name string, db *sqlx.DB) *Prototype {
 }
 
 type ReqUri struct {
-	ID xuuid.UUID `uri:"id" binding:"required"`
+	ID xuuid.UUID `uri:"id" binding:"required" db:"id"`
 }
 
 //================================================================
