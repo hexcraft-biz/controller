@@ -66,8 +66,43 @@ func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest in
 }
 
 // Get
-func (p Prototype) RestfulGet(c *gin.Context, hook func(interface{}, string) error, dest interface{}, key string) {
-	if err := hook(dest, key); err != nil {
+func (p Prototype) RestfulGet(c *gin.Context, me model.EngineInterface, dest interface{}) {
+	uri := new(ReqUri)
+	if err := c.ShouldBindUri(uri); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if err := me.GetByID(dest, uri.ID); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		}
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
+	}
+}
+
+func (p Prototype) RestfulGetByKey(c *gin.Context, me model.EngineInterface, dest interface{}) {
+	uri := new(ReqUri)
+	if err := c.ShouldBindUri(uri); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if err := me.GetByKey(dest, uri.ID.String()); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		}
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
+	}
+}
+
+func (p Prototype) RestfulGetByHook(c *gin.Context, hook func(dest, id interface{}) error, dest interface{}) {
+	uri := new(ReqUri)
+	if err := c.ShouldBindUri(uri); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if err := hook(dest, uri.ID.String()); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
@@ -82,28 +117,32 @@ func (p Prototype) RestfulGet(c *gin.Context, hook func(interface{}, string) err
 //================================================================
 // Update
 //================================================================
-func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.EngineInterface, id string) {
-	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
+func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.EngineInterface) {
+	uri := new(ReqUri)
+	if err := c.ShouldBindUri(uri); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
+	} else if exists, err := me.Has(uri.ID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if _, err := me.UpdateByID(uri.ID, req); err != nil {
+		MysqlErrDefaultResponse(c, err, nil)
 	} else {
-		if exists, err := me.Has(id); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		} else if !exists {
-			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-		} else if _, err := me.UpdateByID(id, req); err != nil {
-			MysqlErrDefaultResponse(c, err, MysqlErrIncorrectValueDefaultHook)
-		} else {
-			c.JSON(http.StatusNoContent, nil)
-		}
+		c.JSON(http.StatusNoContent, nil)
 	}
 }
 
 //================================================================
 // Delete
 //================================================================
-func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, id string) {
-	if affectedRows, err := me.DeleteByID(id); err != nil {
-		MysqlErrDefaultResponse(c, err, MysqlErrIncorrectValueDefaultHook)
+func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface) {
+	uri := new(ReqUri)
+	if err := c.ShouldBindUri(uri); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+	} else if affectedRows, err := me.DeleteByID(uri.ID); err != nil {
+		MysqlErrDefaultResponse(c, err, nil)
 	} else if affectedRows <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 	} else {
@@ -131,15 +170,6 @@ func MysqlErrDefaultResponse(c *gin.Context, err error, hook func(*gin.Context, 
 			}
 		}
 	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-	}
-}
-
-func MysqlErrIncorrectValueDefaultHook(c *gin.Context, err *mysql.MySQLError) {
-	switch err.Number {
-	case model.MysqlErrCodeIncorrectValue:
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	default:
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
 }
