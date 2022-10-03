@@ -54,11 +54,11 @@ type ReqList struct {
 	Length uint64 `form:"len" binding:"omitempty,numeric,min=1,max=400"`
 }
 
-func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest interface{}, searchCols []string) {
+func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest, pkCols interface{}, searchCols []string, orderby string) {
 	req := new(ReqList)
 	if err := c.ShouldBindWith(req, binding.Query); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
-	} else if err := me.List(dest, req.Query, searchCols, model.NewPagination(req.Offset, req.Length)); err != nil {
+	} else if err := me.List(dest, pkCols, orderby, req.Query, searchCols, model.NewPagination(req.Offset, req.Length)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": dest})
@@ -66,11 +66,8 @@ func (p Prototype) RestfulList(c *gin.Context, me model.EngineInterface, dest in
 }
 
 // Get
-func (p Prototype) RestfulGet(c *gin.Context, me model.EngineInterface, dest interface{}) {
-	uri := new(ReqUri)
-	if err := c.ShouldBindUri(uri); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	} else if err := me.GetByID(dest, uri.ID); err != nil {
+func (p Prototype) RestfulGet(c *gin.Context, me model.EngineInterface, dest, pkCols interface{}) {
+	if err := me.GetByPrimaryKeys(dest, pkCols); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
@@ -117,17 +114,14 @@ func (p Prototype) RestfulGetByHook(c *gin.Context, hook func(dest, id interface
 //================================================================
 // Update
 //================================================================
-func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.EngineInterface) {
-	uri := new(ReqUri)
-	if err := c.ShouldBindUri(uri); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	} else if err := c.ShouldBindWith(req, binding.JSON); err != nil {
+func (p Prototype) RestfulUpdateByID(c *gin.Context, pkCols, req interface{}, me model.EngineInterface) {
+	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
-	} else if exists, err := me.Has(uri.ID); err != nil {
+	} else if exists, err := me.Has(pkCols); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	} else if !exists {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	} else if _, err := me.UpdateByID(uri.ID, req); err != nil {
+	} else if _, err := me.UpdateByPrimaryKeys(pkCols, req); err != nil {
 		MysqlErrDefaultResponse(c, err, nil)
 	} else {
 		c.JSON(http.StatusNoContent, nil)
@@ -137,11 +131,8 @@ func (p Prototype) RestfulUpdateByID(c *gin.Context, req interface{}, me model.E
 //================================================================
 // Delete
 //================================================================
-func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface) {
-	uri := new(ReqUri)
-	if err := c.ShouldBindUri(uri); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-	} else if affectedRows, err := me.DeleteByID(uri.ID); err != nil {
+func (p Prototype) RestfulDeleteByID(c *gin.Context, me model.EngineInterface, pkCols interface{}) {
+	if affectedRows, err := me.DeleteByPrimaryKeys(pkCols); err != nil {
 		MysqlErrDefaultResponse(c, err, nil)
 	} else if affectedRows <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
