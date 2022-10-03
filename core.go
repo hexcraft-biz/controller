@@ -120,9 +120,7 @@ func (p Prototype) RestfulGetByHook(c *gin.Context, hook func(dest, id interface
 // Update
 //================================================================
 func (p Prototype) RestfulUpdateByID(c *gin.Context, me model.EngineInterface, pkCols, req interface{}) {
-	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
-	} else if exists, err := me.Has(pkCols); err != nil {
+	if exists, err := me.Has(pkCols); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	} else if !exists {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
