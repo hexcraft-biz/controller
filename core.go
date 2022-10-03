@@ -30,7 +30,7 @@ type ReqUri struct {
 //================================================================
 // Insert
 //================================================================
-func (p Prototype) RestfulInsert(c *gin.Context, req model.PrototypeInterface, me model.EngineInterface) {
+func (p Prototype) RestfulInsert(c *gin.Context, me model.EngineInterface, req model.PrototypeInterface) {
 	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 	} else {
@@ -114,7 +114,7 @@ func (p Prototype) RestfulGetByHook(c *gin.Context, hook func(dest, id interface
 //================================================================
 // Update
 //================================================================
-func (p Prototype) RestfulUpdateByID(c *gin.Context, pkCols, req interface{}, me model.EngineInterface) {
+func (p Prototype) RestfulUpdateByID(c *gin.Context, me model.EngineInterface, pkCols, req interface{}) {
 	if err := c.ShouldBindWith(req, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 	} else if exists, err := me.Has(pkCols); err != nil {
