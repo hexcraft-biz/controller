@@ -30,7 +30,17 @@ type ReqUri struct {
 //================================================================
 // Insert
 //================================================================
-func (p Prototype) RestfulInsert(c *gin.Context, me model.EngineInterface, req interface{}) {
+func (p Prototype) RestfulInsert(c *gin.Context, me, meHasUri model.EngineInterface, req, hasUriPkCols interface{}) {
+	if meHasUri != nil {
+		if exists, err := meHasUri.Has(hasUriPkCols); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		} else if !exists {
+			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
+			return
+		}
+	}
+
 	if _, err := me.Insert(req); err != nil {
 		MysqlErrDefaultResponse(c, err, nil)
 	} else {
