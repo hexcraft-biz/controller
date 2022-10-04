@@ -26,6 +26,12 @@ type ReqUri struct {
 	ID xuuid.UUID `uri:"id" binding:"required" db:"id"`
 }
 
+type ReqList struct {
+	Query string `form:"q" binding:"omitempty"`
+	Pos   uint16 `form:"pos" binding:"omitempty"`
+	Len   uint16 `form:"len" binding:"omitempty"`
+}
+
 //================================================================
 // Read
 //================================================================
