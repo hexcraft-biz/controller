@@ -17,13 +17,13 @@ const (
 )
 
 type Binding struct {
-	Role            RoleType
-	ResourceKeys    interface{}
-	Payload         interface{}
-	QueryParameters model.QueryParametersInterface // Only for List()
-	ModelResource   model.EngineInterface
-	ModelWrite      model.EngineInterface
-	ModelOutput     model.EngineInterface
+	Role              RoleType
+	ResourceKeys      interface{}
+	Payload           interface{}
+	QueryParameters   model.QueryParametersInterface // Only for List()
+	ModelReadResource model.EngineInterface
+	ModelWrite        model.EngineInterface
+	ModelOutput       model.EngineInterface
 	*RoleService
 	*RoleAdmin
 	*RoleUser
