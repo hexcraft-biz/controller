@@ -15,16 +15,16 @@ const (
 	RoleUser
 )
 
-type Request struct {
-	Role Role
-	*Admin
-	*User
+type Binding struct {
+	Role            Role
 	ResourceKeys    interface{}
 	Payload         interface{}
 	QueryParameters model.QueryParametersInterface // Only for List()
 	ModelResource   model.EngineInterface
 	ModelWrite      model.EngineInterface
 	ModelOutput     model.EngineInterface
+	*Admin
+	*User
 }
 
 type ResourceIdentityInterface interface {
@@ -34,12 +34,12 @@ type ResourceIdentityInterface interface {
 //----------------------------------------------------------------
 // Role
 //----------------------------------------------------------------
-func (r *Request) BindRole(c *gin.Context, headerAffix string) error {
-	switch r.Role {
+func (b *Binding) BindRole(c *gin.Context, headerAffix string) error {
+	switch b.Role {
 	case RoleAdmin:
-		return r.BindRoleAdmin(c)
+		return b.BindRoleAdmin(c)
 	case RoleUser:
-		return r.BindRoleUser(c, headerAffix)
+		return b.BindRoleUser(c, headerAffix)
 	default:
 		return nil
 	}
@@ -53,14 +53,14 @@ type Admin struct {
 	Email         string
 }
 
-func (r *Request) BindRoleAdmin(c *gin.Context) error {
+func (b *Binding) BindRoleAdmin(c *gin.Context) error {
 	var err error
 	pieces := strings.Split(c.GetHeader("X-Goog-Authenticated-User-Email"), ":")
 
 	if len(pieces) != 2 {
 		err = errors.New("Invalid user.")
 	} else {
-		r.Admin = &Admin{
+		b.Admin = &Admin{
 			Authenticator: pieces[0],
 			Email:         pieces[1],
 		}
@@ -77,7 +77,7 @@ type User struct {
 	Identity string
 }
 
-func (r *Request) BindRoleUser(c *gin.Context, headerAffix string) error {
+func (b *Binding) BindRoleUser(c *gin.Context, headerAffix string) error {
 	var err error
 	id := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id")
 	identity := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email")
@@ -85,7 +85,7 @@ func (r *Request) BindRoleUser(c *gin.Context, headerAffix string) error {
 	if id == "" || identity == "" {
 		err = errors.New("Invalid user.")
 	} else {
-		r.User = &User{
+		b.User = &User{
 			ID:       id,
 			Identity: identity,
 		}
@@ -97,9 +97,9 @@ func (r *Request) BindRoleUser(c *gin.Context, headerAffix string) error {
 //----------------------------------------------------------------
 // HasResource
 //----------------------------------------------------------------
-func (r *Request) HasResource() (bool, error) {
-	if r.ModelResource != nil {
-		return r.ModelResource.Has(r.ResourceKeys)
+func (b *Binding) HasResource() (bool, error) {
+	if b.ModelResource != nil {
+		return b.ModelResource.Has(b.ResourceKeys)
 	}
 	return true, nil
 }
