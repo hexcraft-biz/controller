@@ -2,7 +2,6 @@ package controller
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/hexcraft-biz/model"
@@ -171,10 +170,10 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
 	if result, err := b.ModelWrite.Update(b.ResourceKeys, b.Payload); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
-	} else if num, err := result.RowsAffected(); err != nil {
+	} else if affectedRows, err := result.RowsAffected(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return err
-	} else if num <= 0 {
+	} else if affectedRows <= 0 {
 		c.JSON(http.StatusConflict, gin.H{"message": "Nothing changed."})
 		return sql.ErrNoRows
 	}
@@ -208,8 +207,8 @@ func (ctrl *Controller) RestDelete(c *gin.Context, b *Binding) error {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return err
 	} else if affectedRows <= 0 {
-		err := errors.New(http.StatusText(http.StatusNotFound))
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		err := sql.ErrNoRows
+		c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
 		return err
 	}
 
