@@ -119,3 +119,14 @@ func (b *Binding) BindRoleUser(c *gin.Context, cfg ConfigInterface) error {
 
 	return err
 }
+
+//----------------------------------------------------------------
+// Fetch
+//----------------------------------------------------------------
+func (b *Binding) HasResource() (bool, error) {
+	return b.ModelReadResource.Has(b.ResourceKeys)
+}
+
+func (b *Binding) GetResource(dest interface{}) error {
+	return b.ModelReadResource.FetchRow(dest, b.ResourceKeys)
+}
