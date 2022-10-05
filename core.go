@@ -200,7 +200,7 @@ func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestDelete(c *gin.Context, b *Binding) error {
-	if result, err := b.ModelResource.Delete(b.ResourceKeys); err != nil {
+	if result, err := b.ModelWrite.Delete(b.ResourceKeys); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	} else if affectedRows, err := result.RowsAffected(); err != nil {
