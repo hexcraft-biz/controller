@@ -28,7 +28,7 @@ type ConfigInterface interface {
 // Rest: Insert
 //================================================================
 func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
-	if err := b.BindRole(c, ctrl.GetHeaderAffix()); err != nil {
+	if err := b.BindRole(c, ctrl); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": err.Error()})
 		return err
 	}
@@ -62,7 +62,7 @@ func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
 // Rest: List
 //================================================================
 func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
-	if err := b.BindRole(c, ctrl.GetHeaderAffix()); err != nil {
+	if err := b.BindRole(c, ctrl); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": err.Error()})
 		return err
 	}
@@ -97,7 +97,7 @@ func (ctrl *Controller) RestList(c *gin.Context, b *Binding, paginate bool) erro
 // Rest: Get
 //================================================================
 func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
-	if err := b.BindRole(c, ctrl.GetHeaderAffix()); err != nil {
+	if err := b.BindRole(c, ctrl); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": err.Error()})
 		return err
 	}
@@ -149,7 +149,7 @@ func (ctrl *Controller) RestGetByKey(c *gin.Context, b *Binding, rii ResourceIde
 // Rest: Update
 //================================================================
 func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
-	if err := b.BindRole(c, ctrl.GetHeaderAffix()); err != nil {
+	if err := b.BindRole(c, ctrl); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": err.Error()})
 		return err
 	}
@@ -181,7 +181,7 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
 // Rest: Delete
 //================================================================
 func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
-	if err := b.BindRole(c, ctrl.GetHeaderAffix()); err != nil {
+	if err := b.BindRole(c, ctrl); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": err.Error()})
 		return err
 	}

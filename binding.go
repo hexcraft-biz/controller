@@ -7,24 +7,26 @@ import (
 	"strings"
 )
 
-type Role uint8
+type RoleType uint8
 
 const (
-	RoleNone Role = iota
-	RoleAdmin
-	RoleUser
+	RoleTypeNone RoleType = iota
+	RoleTypeService
+	RoleTypeAdmin
+	RoleTypeUser
 )
 
 type Binding struct {
-	Role            Role
+	Role            RoleType
 	ResourceKeys    interface{}
 	Payload         interface{}
 	QueryParameters model.QueryParametersInterface // Only for List()
 	ModelResource   model.EngineInterface
 	ModelWrite      model.EngineInterface
 	ModelOutput     model.EngineInterface
-	*Admin
-	*User
+	*RoleService
+	*RoleAdmin
+	*RoleUser
 }
 
 type ResourceIdentityInterface interface {
@@ -34,33 +36,56 @@ type ResourceIdentityInterface interface {
 //----------------------------------------------------------------
 // Role
 //----------------------------------------------------------------
-func (b *Binding) BindRole(c *gin.Context, headerAffix string) error {
+func (b *Binding) BindRole(c *gin.Context, cfg ConfigInterface) error {
 	switch b.Role {
-	case RoleAdmin:
-		return b.BindRoleAdmin(c)
-	case RoleUser:
-		return b.BindRoleUser(c, headerAffix)
+	case RoleTypeService:
+		return b.BindRoleService(c, cfg)
+	case RoleTypeAdmin:
+		return b.BindRoleAdmin(c, cfg)
+	case RoleTypeUser:
+		return b.BindRoleUser(c, cfg)
 	default:
 		return nil
 	}
 }
 
 //----------------------------------------------------------------
-// Admin
+// RoleService
 //----------------------------------------------------------------
-type Admin struct {
+type RoleService struct {
+	ClientID string
+}
+
+func (b *Binding) BindRoleService(c *gin.Context, cfg ConfigInterface) error {
+	var err error
+	clientID := c.GetHeader("X-" + cfg.GetHeaderAffix() + "-Authenticated-Client-Id")
+
+	// TODO: Might add more verification.
+	if clientID == "" {
+		err = errors.New("Invalid user.")
+	} else {
+		b.RoleService = &RoleService{ClientID: clientID}
+	}
+
+	return err
+}
+
+//----------------------------------------------------------------
+// RoleAdmin
+//----------------------------------------------------------------
+type RoleAdmin struct {
 	Authenticator string
 	Email         string
 }
 
-func (b *Binding) BindRoleAdmin(c *gin.Context) error {
+func (b *Binding) BindRoleAdmin(c *gin.Context, cfg ConfigInterface) error {
 	var err error
 	pieces := strings.Split(c.GetHeader("X-Goog-Authenticated-User-Email"), ":")
 
 	if len(pieces) != 2 {
 		err = errors.New("Invalid user.")
 	} else {
-		b.Admin = &Admin{
+		b.RoleAdmin = &RoleAdmin{
 			Authenticator: pieces[0],
 			Email:         pieces[1],
 		}
@@ -70,22 +95,23 @@ func (b *Binding) BindRoleAdmin(c *gin.Context) error {
 }
 
 //----------------------------------------------------------------
-// User
+// RoleUser
 //----------------------------------------------------------------
-type User struct {
+type RoleUser struct {
 	ID       interface{} `db:"user_id"`
 	Identity string
 }
 
-func (b *Binding) BindRoleUser(c *gin.Context, headerAffix string) error {
+func (b *Binding) BindRoleUser(c *gin.Context, cfg ConfigInterface) error {
 	var err error
+	headerAffix := cfg.GetHeaderAffix()
 	id := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id")
 	identity := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email")
 
 	if id == "" || identity == "" {
 		err = errors.New("Invalid user.")
 	} else {
-		b.User = &User{
+		b.RoleUser = &RoleUser{
 			ID:       id,
 			Identity: identity,
 		}
