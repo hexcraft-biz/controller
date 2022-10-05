@@ -123,9 +123,9 @@ func (b *Binding) BindRoleUser(c *gin.Context, cfg ConfigInterface) error {
 //----------------------------------------------------------------
 // HasResource
 //----------------------------------------------------------------
-func (b *Binding) HasResource() (bool, error) {
+func (b *Binding) HasResource(resourceKeys interface{}) (bool, error) {
 	if b.ModelResource != nil {
-		return b.ModelResource.Has(b.ResourceKeys)
+		return b.ModelResource.Has(resourceKeys)
 	}
 	return true, nil
 }
