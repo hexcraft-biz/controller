@@ -175,7 +175,7 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return err
 	} else if num <= 0 {
-		c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
+		c.JSON(http.StatusConflict, gin.H{"message": "Nothing changed."})
 		return sql.ErrNoRows
 	}
 
