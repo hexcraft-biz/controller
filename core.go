@@ -168,9 +168,15 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
-	if _, err := b.ModelWrite.Update(b.ResourceKeys, b.Payload); err != nil {
+	if result, err := b.ModelWrite.Update(b.ResourceKeys, b.Payload); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
+	} else if num, err := result.RowsAffected(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return err
+	} else if num <= 0 {
+		c.JSON(http.StatusConflict, gin.H{"message": http.StatusText(http.StatusConflict)})
+		return sql.ErrNoRows
 	}
 
 	c.JSON(http.StatusNoContent, nil)

@@ -119,13 +119,3 @@ func (b *Binding) BindRoleUser(c *gin.Context, cfg ConfigInterface) error {
 
 	return err
 }
-
-//----------------------------------------------------------------
-// HasResource
-//----------------------------------------------------------------
-func (b *Binding) HasResource(resourceKeys interface{}) (bool, error) {
-	if b.ModelResource != nil {
-		return b.ModelResource.Has(resourceKeys)
-	}
-	return true, nil
-}
