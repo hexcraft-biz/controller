@@ -39,7 +39,7 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 		}
 	}
 
-	if err := c.ShouldBindJSON(b.WriteData); err != nil {
+	if err := c.ShouldBindJSON(b.Write); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return err
 	}
@@ -48,12 +48,12 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
-	if _, err := b.ModelWrite.Insert(b.WriteData); err != nil {
+	if _, err := b.ModelWrite.Insert(b.Write); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": b.WriteData})
+	c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": b.Write})
 	return nil
 }
 
@@ -158,7 +158,7 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if err := c.ShouldBindJSON(b.WriteData); err != nil {
+	if err := c.ShouldBindJSON(b.Write); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return err
 	}
@@ -167,7 +167,7 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
-	if result, err := b.ModelWrite.Update(b.WriteResourceKeys, b.WriteData); err != nil {
+	if result, err := b.ModelWrite.Update(b.WriteResourceKeys, b.Write); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	} else if affectedRows, err := result.RowsAffected(); err != nil {

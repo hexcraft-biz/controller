@@ -22,7 +22,7 @@ type Binding struct {
 	Role              RoleType
 	ReadResourceKeys  interface{}
 	WriteResourceKeys interface{}
-	WriteData         interface{}
+	Write             interface{}
 	QueryParameters   model.QueryParametersInterface // Only for List()
 	ModelReadResource model.EngineInterface
 	ModelWrite        model.EngineInterface
