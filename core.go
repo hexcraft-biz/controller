@@ -32,14 +32,14 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if b.ResourceKeys != nil {
-		if err := c.ShouldBindUri(b.ResourceKeys); err != nil {
+	if b.ReadResourceKeys != nil {
+		if err := c.ShouldBindUri(b.ReadResourceKeys); err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 			return err
 		}
 	}
 
-	if err := c.ShouldBindJSON(b.Payload); err != nil {
+	if err := c.ShouldBindJSON(b.WriteData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return err
 	}
@@ -48,12 +48,12 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
-	if _, err := b.ModelWrite.Insert(b.Payload); err != nil {
+	if _, err := b.ModelWrite.Insert(b.WriteData); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": b.Payload})
+	c.JSON(http.StatusCreated, gin.H{"message": http.StatusText(http.StatusCreated), "results": b.WriteData})
 	return nil
 }
 
@@ -66,8 +66,8 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if b.ResourceKeys != nil {
-		if err := c.ShouldBindUri(b.ResourceKeys); err != nil {
+	if b.ReadResourceKeys != nil {
+		if err := c.ShouldBindUri(b.ReadResourceKeys); err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 			return err
 		}
@@ -83,7 +83,7 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 
 func (ctrl *Controller) RestList(c *gin.Context, b *Binding, paginate bool) error {
 	dest := b.ModelOutput.NewRows()
-	if err := b.ModelOutput.FetchRows(dest, b.ResourceKeys, b.QueryParameters, paginate); err != nil {
+	if err := b.ModelOutput.FetchRows(dest, b.ReadResourceKeys, b.QueryParameters, paginate); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return err
 	}
@@ -101,7 +101,7 @@ func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if err := c.ShouldBindUri(b.ResourceKeys); err != nil {
+	if err := c.ShouldBindUri(b.ReadResourceKeys); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 		return err
 	}
@@ -111,7 +111,7 @@ func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
 
 func (ctrl *Controller) RestGet(c *gin.Context, b *Binding) error {
 	dest := b.ModelOutput.NewRow()
-	if err := b.ModelOutput.FetchRow(dest, b.ResourceKeys); err != nil {
+	if err := b.GetResource(dest); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
@@ -153,12 +153,12 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if err := c.ShouldBindUri(b.ResourceKeys); err != nil {
+	if err := c.ShouldBindUri(b.ReadResourceKeys); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 		return err
 	}
 
-	if err := c.ShouldBindJSON(b.Payload); err != nil {
+	if err := c.ShouldBindJSON(b.WriteData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return err
 	}
@@ -167,7 +167,7 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding) error {
-	if result, err := b.ModelWrite.Update(b.ResourceKeys, b.Payload); err != nil {
+	if result, err := b.ModelWrite.Update(b.WriteResourceKeys, b.WriteData); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	} else if affectedRows, err := result.RowsAffected(); err != nil {
@@ -191,7 +191,7 @@ func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if err := c.ShouldBindUri(b.ResourceKeys); err != nil {
+	if err := c.ShouldBindUri(b.ReadResourceKeys); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
 		return err
 	}
@@ -200,7 +200,7 @@ func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
 }
 
 func (ctrl *Controller) RestDelete(c *gin.Context, b *Binding) error {
-	if result, err := b.ModelWrite.Delete(b.ResourceKeys); err != nil {
+	if result, err := b.ModelWrite.Delete(b.WriteResourceKeys); err != nil {
 		MysqlErrDefaultResponse(c, err)
 		return err
 	} else if affectedRows, err := result.RowsAffected(); err != nil {

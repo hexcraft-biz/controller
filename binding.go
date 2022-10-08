@@ -1,5 +1,7 @@
 package controller
 
+// TODO: Bind header
+
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,9 @@ const (
 
 type Binding struct {
 	Role              RoleType
-	ResourceKeys      interface{}
-	Payload           interface{}
+	ReadResourceKeys  interface{}
+	WriteResourceKeys interface{}
+	WriteData         interface{}
 	QueryParameters   model.QueryParametersInterface // Only for List()
 	ModelReadResource model.EngineInterface
 	ModelWrite        model.EngineInterface
@@ -124,9 +127,9 @@ func (b *Binding) BindRoleUser(c *gin.Context, cfg ConfigInterface) error {
 // Fetch
 //----------------------------------------------------------------
 func (b *Binding) HasResource() (bool, error) {
-	return b.ModelReadResource.Has(b.ResourceKeys)
+	return b.ModelReadResource.Has(b.ReadResourceKeys)
 }
 
 func (b *Binding) GetResource(dest interface{}) error {
-	return b.ModelReadResource.FetchRow(dest, b.ResourceKeys)
+	return b.ModelReadResource.FetchRow(dest, b.ReadResourceKeys)
 }
