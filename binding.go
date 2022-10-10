@@ -145,7 +145,7 @@ func (r *RoleService) GetIdentity() string {
 	return r.Identity
 }
 
-func bindRoleService(c *gin.Context, cfg ConfigInterface) RoleInterface {
+func bindRoleService(c *gin.Context, cfg ConfigInterface) *RoleService {
 	return &RoleService{
 		Identity: c.GetHeader(cfg.GetSchedulerHeader()),
 	}
@@ -164,7 +164,8 @@ func (r *RoleAdmin) GetRole() RoleType {
 }
 
 func (r *RoleAdmin) IsLegit() bool {
-	return r.Identity != ""
+	// TODO: Might add more...
+	return r.Authenticator != "" && r.Identity != ""
 }
 
 func (r *RoleAdmin) GetIdentity() string {
@@ -175,15 +176,13 @@ func (r *RoleAdmin) GetAuthenticator() string {
 	return r.Authenticator
 }
 
-func bindRoleAdmin(c *gin.Context, cfg ConfigInterface) RoleInterface {
+func bindRoleAdmin(c *gin.Context, cfg ConfigInterface) *RoleAdmin {
 	pieces := strings.Split(c.GetHeader("X-Goog-Authenticated-User-Email"), ":")
 	r := new(RoleAdmin)
-
 	if len(pieces) == 2 {
 		r.Authenticator = pieces[0]
 		r.Identity = pieces[1]
 	}
-
 	return r
 }
 
@@ -211,7 +210,7 @@ func (r *RoleUser) GetID() string {
 	return r.ID
 }
 
-func bindRoleUser(c *gin.Context, cfg ConfigInterface) RoleInterface {
+func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
 	headerAffix := cfg.GetHeaderAffix()
 	return &RoleUser{
 		Identity: c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email"),
