@@ -78,9 +78,9 @@ func (b *Binding) AnchorFetchRow(dest interface{}) error {
 	return b.Anchor.Model.FetchRow(dest, b.Anchor.Keys)
 }
 
-func (b *Binding) OutputRows(paginate bool) (interface{}, error) {
+func (b *Binding) OutputRows() (interface{}, error) {
 	rows := b.Output.Model.NewRows()
-	err := b.Output.Model.FetchRows(rows, b.Output.Keys, b.Output.QueryParameters, paginate)
+	err := b.Output.Model.FetchRows(rows, b.Output.Keys, b.Output.QueryParameters)
 	return rows, err
 }
 

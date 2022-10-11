@@ -95,7 +95,7 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 	return nil
 }
 
-func (ctrl *Controller) RestList(c *gin.Context, b *Binding, paginate bool) error {
+func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
 	if b.Anchor != nil && b.Anchor.Model != nil {
 		if exists, err := b.AnchorHas(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -106,7 +106,7 @@ func (ctrl *Controller) RestList(c *gin.Context, b *Binding, paginate bool) erro
 		}
 	}
 
-	if rows, err := b.OutputRows(paginate); err != nil {
+	if rows, err := b.OutputRows(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return err
 	} else {
