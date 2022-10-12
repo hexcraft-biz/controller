@@ -91,6 +91,8 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 	return nil
 }
 
+// https://example.com/resources
+// https://example.com/resources/:id/subs
 func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
 	if b.Anchor != nil && b.Anchor.Model != nil {
 		if exists, err := b.AnchorHas(); err != nil {

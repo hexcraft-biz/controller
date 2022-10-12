@@ -163,8 +163,8 @@ func (b *Binding) SetAnchor(keys interface{}, model model.EngineInterface) *Bind
 	return b
 }
 
-func (b *Binding) SetWrite(keys interface{}, model model.EngineInterface) *Binding {
-	b.Write = NewResource(keys, model, nil)
+func (b *Binding) SetWrite(assignments interface{}, model model.EngineInterface) *Binding {
+	b.Write = NewResource(assignments, model, nil)
 	return b
 }
 
