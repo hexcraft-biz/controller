@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+//================================================================
+// Role
+//================================================================
 type RoleType uint8
 
 const (
@@ -16,110 +19,6 @@ const (
 	RoleTypeUser
 )
 
-type Binding struct {
-	Role RoleInterface
-
-	// For URI or row status checking
-	Anchor *Resource
-
-	// Insert, Update, Delete
-	Write *Resource
-
-	// List, Get
-	Output *Resource
-}
-
-func NewBinding(c *gin.Context, cfg ConfigInterface, role RoleType) *Binding {
-	b := new(Binding)
-	switch role {
-	case RoleTypeService:
-		b.Role = bindRoleService(c, cfg)
-	case RoleTypeAdmin:
-		b.Role = bindRoleAdmin(c, cfg)
-	case RoleTypeUser:
-		b.Role = bindRoleUser(c, cfg)
-	}
-
-	return b
-}
-
-func NewResource(keys interface{}, model model.EngineInterface, qp model.QueryParametersInterface) *Resource {
-	return &Resource{
-		Keys:            keys,
-		Model:           model,
-		QueryParameters: qp,
-	}
-}
-
-func (b *Binding) SetAnchor(keys interface{}, model model.EngineInterface) *Binding {
-	b.Anchor = NewResource(keys, model, nil)
-	return b
-}
-
-func (b *Binding) SetWrite(keys interface{}, model model.EngineInterface) *Binding {
-	b.Write = NewResource(keys, model, nil)
-	return b
-}
-
-func (b *Binding) SetOutput(keys interface{}, model model.EngineInterface, qp model.QueryParametersInterface) *Binding {
-	b.Output = NewResource(keys, model, qp)
-	return b
-}
-
-func (b *Binding) Insert() (sql.Result, error) {
-	return b.Write.Model.Insert(b.Write.Keys)
-}
-
-func (b *Binding) AnchorHas() (bool, error) {
-	return b.Anchor.Model.Has(b.Anchor.Keys)
-}
-
-func (b *Binding) AnchorFetchRow(dest interface{}) error {
-	return b.Anchor.Model.FetchRow(dest, b.Anchor.Keys)
-}
-
-func (b *Binding) OutputRows() (interface{}, error) {
-	rows := b.Output.Model.NewRows()
-	err := b.Output.Model.FetchRows(rows, b.Output.Keys, b.Output.QueryParameters)
-	return rows, err
-}
-
-func (b *Binding) OutputRow() (interface{}, error) {
-	row := b.Output.Model.NewRow()
-	err := b.Output.Model.FetchRow(row, b.Output.Keys)
-	return row, err
-}
-
-func (b *Binding) OutputRowByKey(rii ResourceIdentityInterface) (interface{}, error) {
-	row := b.Output.Model.NewRow()
-	err := b.Output.Model.FetchByKey(row, rii.GetIdentity())
-	return row, err
-}
-
-func (b *Binding) Update(conds interface{}) (sql.Result, error) {
-	return b.Write.Model.Update(conds, b.Write.Keys)
-}
-
-func (b *Binding) Delete(conds interface{}) (sql.Result, error) {
-	return b.Write.Model.Delete(conds)
-}
-
-//----------------------------------------------------------------
-// Resource
-//----------------------------------------------------------------
-type Resource struct {
-	Keys            interface{}
-	Model           model.EngineInterface
-	QueryParameters model.QueryParametersInterface // Only for List()
-}
-
-type ResourceIdentityInterface interface {
-	GetIdentity() interface{}
-}
-
-//----------------------------------------------------------------
-// Role
-//----------------------------------------------------------------
 type RoleInterface interface {
 	GetRole() RoleType
 	IsLegit() bool
@@ -216,4 +115,92 @@ func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
 		Identity: c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email"),
 		ID:       c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id"),
 	}
+}
+
+//================================================================
+// Resource
+//================================================================
+type Resource struct {
+	Keys            interface{}
+	Model           model.EngineInterface
+	QueryParameters model.QueryParametersInterface // Only for List()
+}
+
+func NewResource(keys interface{}, model model.EngineInterface, qp model.QueryParametersInterface) *Resource {
+	return &Resource{
+		Keys:            keys,
+		Model:           model,
+		QueryParameters: qp,
+	}
+}
+
+//================================================================
+// Binding
+//================================================================
+type Binding struct {
+	Role   RoleInterface
+	Anchor *Resource
+	Write  *Resource
+	Output *Resource
+}
+
+func NewBinding(c *gin.Context, cfg ConfigInterface, role RoleType) *Binding {
+	b := new(Binding)
+	switch role {
+	case RoleTypeService:
+		b.Role = bindRoleService(c, cfg)
+	case RoleTypeAdmin:
+		b.Role = bindRoleAdmin(c, cfg)
+	case RoleTypeUser:
+		b.Role = bindRoleUser(c, cfg)
+	}
+
+	return b
+}
+
+func (b *Binding) SetAnchor(keys interface{}, model model.EngineInterface) *Binding {
+	b.Anchor = NewResource(keys, model, nil)
+	return b
+}
+
+func (b *Binding) SetWrite(keys interface{}, model model.EngineInterface) *Binding {
+	b.Write = NewResource(keys, model, nil)
+	return b
+}
+
+func (b *Binding) SetOutput(keys interface{}, model model.EngineInterface, qp model.QueryParametersInterface) *Binding {
+	b.Output = NewResource(keys, model, qp)
+	return b
+}
+
+func (b *Binding) Insert() (sql.Result, error) {
+	return b.Write.Model.Insert(b.Write.Keys)
+}
+
+func (b *Binding) AnchorHas() (bool, error) {
+	return b.Anchor.Model.Has(b.Anchor.Keys)
+}
+
+func (b *Binding) AnchorFetchRow(dest interface{}) error {
+	return b.Anchor.Model.FetchRow(dest, b.Anchor.Keys)
+}
+
+func (b *Binding) OutputRows() (interface{}, error) {
+	rows := b.Output.Model.NewRows()
+	err := b.Output.Model.FetchRows(rows, b.Output.Keys, b.Output.QueryParameters)
+	return rows, err
+}
+
+func (b *Binding) OutputRow() (interface{}, error) {
+	row := b.Output.Model.NewRow()
+	err := b.Output.Model.FetchRow(row, b.Output.Keys)
+	return row, err
+}
+
+func (b *Binding) Update(conds interface{}) (sql.Result, error) {
+	return b.Write.Model.Update(conds, b.Write.Keys)
+}
+
+func (b *Binding) Delete(conds interface{}) (sql.Result, error) {
+	return b.Write.Model.Delete(conds)
 }

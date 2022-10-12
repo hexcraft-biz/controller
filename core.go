@@ -2,16 +2,12 @@ package controller
 
 import (
 	"database/sql"
-	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/hexcraft-biz/model"
 	"github.com/jmoiron/sqlx"
 	"net/http"
-)
-
-var (
-	ErrInvalidRole = errors.New("Invalid Role")
 )
 
 type Controller struct {
@@ -31,7 +27,7 @@ type ConfigInterface interface {
 
 func (ctrl *Controller) bindRole(c *gin.Context, b *Binding) error {
 	if b.Role == nil || !b.Role.IsLegit() {
-		return ErrInvalidRole
+		return fmt.Errorf("Invalid role.")
 	}
 
 	return nil
@@ -134,21 +130,6 @@ func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
 
 func (ctrl *Controller) RestGet(c *gin.Context, b *Binding) error {
 	if row, err := b.OutputRow(); err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		}
-		return err
-	} else {
-		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": row})
-		return nil
-	}
-}
-
-func (ctrl *Controller) RestGetByKey(c *gin.Context, b *Binding, rii ResourceIdentityInterface) error {
-	if row, err := b.OutputRowByKey(rii); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
