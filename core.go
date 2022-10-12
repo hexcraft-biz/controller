@@ -91,26 +91,14 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 	return nil
 }
 
-// https://example.com/resources
-// https://example.com/resources/:id/subs
 func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
-	if b.Anchor != nil && b.Anchor.Model != nil {
-		if exists, err := b.AnchorHas(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return err
-		} else if !exists {
-			c.JSON(http.StatusNotFound, gin.H{"message": http.StatusText(http.StatusNotFound)})
-			return sql.ErrNoRows
-		}
-	}
-
-	if rows, err := b.OutputRows(); err != nil {
+	rows, err := b.OutputRows()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return err
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": http.StatusText(http.StatusOK), "results": rows})
-		return nil
 	}
+	return err
 }
 
 //================================================================
