@@ -149,9 +149,11 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if err := c.ShouldBindJSON(b.Write.Keys); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
-		return err
+	if b.Write.Keys != nil {
+		if err := c.ShouldBindJSON(b.Write.Keys); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
+			return err
+		}
 	}
 
 	return nil
