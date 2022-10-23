@@ -3,6 +3,8 @@ package controller
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/hexcraft-biz/misc/xuuid"
 	"github.com/hexcraft-biz/model"
 	"strings"
 )
@@ -107,6 +109,15 @@ func (r *RoleUser) GetIdentity() string {
 
 func (r *RoleUser) GetID() string {
 	return r.ID
+}
+
+func (r *RoleUser) GetXuuid() (*xuuid.UUID, error) {
+	u, err := uuid.Parse(r.ID)
+	if err != nil {
+		return nil, err
+	}
+	xu := xuuid.UUID(u)
+	return &xu, nil
 }
 
 func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
