@@ -24,7 +24,7 @@ const (
 type RoleInterface interface {
 	GetRole() RoleType
 	IsLegit() bool
-	GetIdentity() string
+	GetIdentity() interface{}
 }
 
 //----------------------------------------------------------------
@@ -42,7 +42,7 @@ func (r *RoleService) IsLegit() bool {
 	return r.Identity != ""
 }
 
-func (r *RoleService) GetIdentity() string {
+func (r *RoleService) GetIdentity() interface{} {
 	return r.Identity
 }
 
@@ -69,7 +69,7 @@ func (r *RoleAdmin) IsLegit() bool {
 	return r.Authenticator != "" && r.Identity != ""
 }
 
-func (r *RoleAdmin) GetIdentity() string {
+func (r *RoleAdmin) GetIdentity() interface{} {
 	return r.Identity
 }
 
@@ -103,12 +103,8 @@ func (r *RoleUser) IsLegit() bool {
 	return r.ID != "" && r.Identity != ""
 }
 
-func (r *RoleUser) GetIdentity() string {
+func (r *RoleUser) GetIdentity() interface{} {
 	return r.Identity
-}
-
-func (r *RoleUser) GetID() string {
-	return r.ID
 }
 
 func (r *RoleUser) GetXuuid() (*xuuid.UUID, error) {
