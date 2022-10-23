@@ -101,7 +101,7 @@ func bindRoleAdmin(c *gin.Context, cfg ConfigInterface) *RoleAdmin {
 //----------------------------------------------------------------
 type RoleUser struct {
 	Identity string
-	ID       string `db:"user_id"`
+	ID       *xuuid.UUID
 }
 
 func (r *RoleUser) GetRole() RoleType {
@@ -109,7 +109,7 @@ func (r *RoleUser) GetRole() RoleType {
 }
 
 func (r *RoleUser) IsLegit() bool {
-	return r.ID != "" && r.Identity != ""
+	return r.ID != nil && r.Identity != ""
 }
 
 func (r *RoleUser) GetIdentity() string {
@@ -117,18 +117,20 @@ func (r *RoleUser) GetIdentity() string {
 }
 
 func (r *RoleUser) GetID() interface{} {
-	if u, err := uuid.Parse(r.ID); err != nil {
-		return nil
-	} else {
-		return xuuid.UUID(u)
-	}
+	return r.ID
 }
 
 func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
 	headerAffix := cfg.GetHeaderAffix()
-	return &RoleUser{
-		Identity: c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email"),
-		ID:       c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id"),
+	id := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id")
+	if u, err := uuid.Parse(id); err != nil {
+		return nil
+	} else {
+		xu := xuuid.UUID(u)
+		return &RoleUser{
+			Identity: c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email"),
+			ID:       &xu,
+		}
 	}
 }
 
