@@ -24,7 +24,8 @@ const (
 type RoleInterface interface {
 	GetRole() RoleType
 	IsLegit() bool
-	GetIdentity() interface{}
+	GetIdentity() string
+	GetID() interface{}
 }
 
 //----------------------------------------------------------------
@@ -42,8 +43,12 @@ func (r *RoleService) IsLegit() bool {
 	return r.Identity != ""
 }
 
-func (r *RoleService) GetIdentity() interface{} {
+func (r *RoleService) GetIdentity() string {
 	return r.Identity
+}
+
+func (r *RoleService) GetID() interface{} {
+	return ""
 }
 
 func bindRoleService(c *gin.Context, cfg ConfigInterface) *RoleService {
@@ -69,8 +74,12 @@ func (r *RoleAdmin) IsLegit() bool {
 	return r.Authenticator != "" && r.Identity != ""
 }
 
-func (r *RoleAdmin) GetIdentity() interface{} {
+func (r *RoleAdmin) GetIdentity() string {
 	return r.Identity
+}
+
+func (r *RoleAdmin) GetID() interface{} {
+	return ""
 }
 
 func (r *RoleAdmin) GetAuthenticator() string {
@@ -103,17 +112,16 @@ func (r *RoleUser) IsLegit() bool {
 	return r.ID != "" && r.Identity != ""
 }
 
-func (r *RoleUser) GetIdentity() interface{} {
+func (r *RoleUser) GetIdentity() string {
 	return r.Identity
 }
 
-func (r *RoleUser) GetXuuid() (*xuuid.UUID, error) {
-	u, err := uuid.Parse(r.ID)
-	if err != nil {
-		return nil, err
+func (r *RoleUser) GetID() interface{} {
+	if u, err := uuid.Parse(r.ID); err != nil {
+		return nil
+	} else {
+		return xuuid.UUID(u)
 	}
-	xu := xuuid.UUID(u)
-	return &xu, nil
 }
 
 func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
