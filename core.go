@@ -21,7 +21,6 @@ func New(cfg ConfigInterface) *Controller {
 type ConfigInterface interface {
 	GetDB() *sqlx.DB
 	GetHeaderAffix() string
-	GetSchedulerHeader() string
 	GetGinMode() string
 }
 

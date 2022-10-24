@@ -52,8 +52,9 @@ func (r *RoleService) GetID() interface{} {
 }
 
 func bindRoleService(c *gin.Context, cfg ConfigInterface) *RoleService {
+	headerAffix := cfg.GetHeaderAffix()
 	return &RoleService{
-		Identity: c.GetHeader(cfg.GetSchedulerHeader()),
+		Identity: c.GetHeader("X-" + headerAffix + "-Client-Id"),
 	}
 }
 
