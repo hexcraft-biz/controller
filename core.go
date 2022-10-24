@@ -37,7 +37,7 @@ func (ctrl *Controller) bindRole(c *gin.Context, b *Binding) error {
 //================================================================
 func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 	if err := ctrl.bindRole(c, b); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
 
@@ -73,7 +73,7 @@ func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
 //================================================================
 func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 	if err := ctrl.bindRole(c, b); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
 //================================================================
 func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
 	if err := ctrl.bindRole(c, b); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
 
@@ -139,7 +139,7 @@ func (ctrl *Controller) RestGet(c *gin.Context, b *Binding) error {
 //================================================================
 func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 	if err := ctrl.bindRole(c, b); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
 
@@ -173,7 +173,7 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding, conds interface{}
 //================================================================
 func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
 	if err := ctrl.bindRole(c, b); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": http.StatusText(http.StatusForbidden)})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
 
