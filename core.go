@@ -11,11 +11,15 @@ import (
 )
 
 type Controller struct {
+	*sqlx.DB
 	ConfigInterface
 }
 
 func New(cfg ConfigInterface) *Controller {
-	return &Controller{ConfigInterface: cfg}
+	return &Controller{
+		DB:              cfg.GetDB(),
+		ConfigInterface: cfg,
+	}
 }
 
 type ConfigInterface interface {
