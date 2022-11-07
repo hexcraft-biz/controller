@@ -88,9 +88,11 @@ func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 		}
 	}
 
-	if err := c.ShouldBindQuery(b.Output.QueryParameters); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return err
+	if b.Output != nil {
+		if err := c.ShouldBindQuery(b.Output.QueryParameters); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return err
+		}
 	}
 
 	return nil
