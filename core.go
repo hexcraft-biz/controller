@@ -54,7 +54,7 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 
 	if b.Write.Keys != nil {
 		if err := c.ShouldBindJSON(b.Write.Keys); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return err
 		}
 	}
