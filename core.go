@@ -28,7 +28,7 @@ type ConfigInterface interface {
 	GetGinMode() string
 }
 
-func (ctrl *Controller) bindRole(c *gin.Context, b *Binding) error {
+func (ctrl *Controller) BindRole(c *gin.Context, b *Binding) error {
 	if b.Role == nil || !b.Role.IsLegit() {
 		return fmt.Errorf("Invalid role.")
 	}
@@ -40,7 +40,7 @@ func (ctrl *Controller) bindRole(c *gin.Context, b *Binding) error {
 // Rest: Insert
 //================================================================
 func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
-	if err := ctrl.bindRole(c, b); err != nil {
+	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
@@ -76,7 +76,7 @@ func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
 // Rest: List
 //================================================================
 func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
-	if err := ctrl.bindRole(c, b); err != nil {
+	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
@@ -112,7 +112,7 @@ func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
 // Rest: Get
 //================================================================
 func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
-	if err := ctrl.bindRole(c, b); err != nil {
+	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
@@ -144,7 +144,7 @@ func (ctrl *Controller) RestGet(c *gin.Context, b *Binding) error {
 // Rest: Update
 //================================================================
 func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
-	if err := ctrl.bindRole(c, b); err != nil {
+	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
@@ -178,7 +178,7 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding, conds interface{}
 // Rest: Delete
 //================================================================
 func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
-	if err := ctrl.bindRole(c, b); err != nil {
+	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return err
 	}
