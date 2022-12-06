@@ -36,9 +36,9 @@ func (ctrl *Controller) BindRole(c *gin.Context, b *Binding) error {
 	return nil
 }
 
-//================================================================
+// ================================================================
 // Rest: Insert
-//================================================================
+// ================================================================
 func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
@@ -52,7 +52,7 @@ func (ctrl *Controller) BindPatternInsert(c *gin.Context, b *Binding) error {
 		}
 	}
 
-	if b.Write.Keys != nil {
+	if b.Write != nil {
 		if err := c.ShouldBindJSON(b.Write.Keys); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return err
@@ -72,9 +72,9 @@ func (ctrl *Controller) RestInsert(c *gin.Context, b *Binding) error {
 	return nil
 }
 
-//================================================================
+// ================================================================
 // Rest: List
-//================================================================
+// ================================================================
 func (ctrl *Controller) BindPatternList(c *gin.Context, b *Binding) error {
 	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
@@ -108,9 +108,9 @@ func (ctrl *Controller) RestList(c *gin.Context, b *Binding) error {
 	return err
 }
 
-//================================================================
+// ================================================================
 // Rest: Get
-//================================================================
+// ================================================================
 func (ctrl *Controller) BindPatternGet(c *gin.Context, b *Binding) error {
 	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
@@ -140,9 +140,9 @@ func (ctrl *Controller) RestGet(c *gin.Context, b *Binding) error {
 	}
 }
 
-//================================================================
+// ================================================================
 // Rest: Update
-//================================================================
+// ================================================================
 func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
@@ -154,7 +154,7 @@ func (ctrl *Controller) BindPatternUpdate(c *gin.Context, b *Binding) error {
 		return err
 	}
 
-	if b.Write.Keys != nil {
+	if b.Write != nil {
 		if err := c.ShouldBindJSON(b.Write.Keys); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 			return err
@@ -174,9 +174,9 @@ func (ctrl *Controller) RestUpdate(c *gin.Context, b *Binding, conds interface{}
 	return nil
 }
 
-//================================================================
+// ================================================================
 // Rest: Delete
-//================================================================
+// ================================================================
 func (ctrl *Controller) BindPatternDelete(c *gin.Context, b *Binding) error {
 	if err := ctrl.BindRole(c, b); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
@@ -201,9 +201,9 @@ func (ctrl *Controller) RestDelete(c *gin.Context, b *Binding, conds interface{}
 	return nil
 }
 
-//================================================================
+// ================================================================
 // MysqlErrDefaultResponse
-//================================================================
+// ================================================================
 func MysqlErrDefaultResponse(c *gin.Context, err error) {
 	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 		switch mysqlErr.Number {
