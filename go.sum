@@ -132,6 +132,8 @@ github.com/hexcraft-biz/model v0.0.62 h1:TZ6eaR0zD4wXNeoZHIVSmX/6e82ICie7jFefgPq
 github.com/hexcraft-biz/model v0.0.62/go.mod h1:UJcd7VZW2K5E/WExbFb4UgKOLGufzehAwgB+b1G3xQw=
 github.com/hexcraft-biz/model v0.0.63 h1:r59oY/7vHKJnkVtkW6oYmwooeNoM3wof6co9MuTrXmo=
 github.com/hexcraft-biz/model v0.0.63/go.mod h1:UJcd7VZW2K5E/WExbFb4UgKOLGufzehAwgB+b1G3xQw=
+github.com/hexcraft-biz/model v0.0.64 h1:68Q4DHIQr+amvi56uOMEjDJa3Xuv4zSnsrNWb0Rc4aM=
+github.com/hexcraft-biz/model v0.0.64/go.mod h1:UJcd7VZW2K5E/WExbFb4UgKOLGufzehAwgB+b1G3xQw=
 github.com/jmoiron/sqlx v1.3.4 h1:wv+0IJZfL5z0uZoUjlpKgHkgaFSYD+r9CfrXjEXsO7w=
 github.com/jmoiron/sqlx v1.3.4/go.mod h1:2BljVx/86SuTyjE+aPYlHCTNvZrnJXghYGpNiXLBMCQ=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
