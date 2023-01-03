@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-//================================================================
+// ================================================================
 // Role
-//================================================================
+// ================================================================
 type RoleType uint8
 
 const (
@@ -28,9 +28,9 @@ type RoleInterface interface {
 	GetID() interface{}
 }
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 // RoleService
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 type RoleService struct {
 	Identity string
 }
@@ -58,9 +58,9 @@ func bindRoleService(c *gin.Context, cfg ConfigInterface) *RoleService {
 	}
 }
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 // RoleAdmin
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 type RoleAdmin struct {
 	Authenticator string
 	Identity      string
@@ -97,9 +97,9 @@ func bindRoleAdmin(c *gin.Context, cfg ConfigInterface) *RoleAdmin {
 	return r
 }
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 // RoleUser
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 type RoleUser struct {
 	Identity string
 	ID       *xuuid.UUID
@@ -124,20 +124,24 @@ func (r *RoleUser) GetID() interface{} {
 func bindRoleUser(c *gin.Context, cfg ConfigInterface) *RoleUser {
 	headerAffix := cfg.GetHeaderAffix()
 	id := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Id")
+	identity := c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email")
 	if u, err := uuid.Parse(id); err != nil {
-		return nil
+		return &RoleUser{
+			Identity: identity,
+			ID:       nil,
+		}
 	} else {
 		xu := xuuid.UUID(u)
 		return &RoleUser{
-			Identity: c.GetHeader("X-" + headerAffix + "-Authenticated-User-Email"),
+			Identity: identity,
 			ID:       &xu,
 		}
 	}
 }
 
-//================================================================
+// ================================================================
 // Resource
-//================================================================
+// ================================================================
 type Resource struct {
 	Keys            interface{}
 	Model           model.EngineInterface
@@ -152,9 +156,9 @@ func NewResource(keys interface{}, model model.EngineInterface, qp model.QueryPa
 	}
 }
 
-//================================================================
+// ================================================================
 // Binding
-//================================================================
+// ================================================================
 type Binding struct {
 	Role   RoleInterface
 	Anchor *Resource
